@@ -1,0 +1,54 @@
+- name: "test-playbook | Commit and Create Branch"
+  hosts: localhost
+  tasks:
+  - rangeid.bitbucketserver.branch:
+      server: "https://{{ lookup('ansible.builtin.env', 'BITBUCKET_SERVER') }}"
+      project: "test"
+      repository: "branchtest"
+      branch: testbranch
+      action: create
+      username: "{{ lookup('ansible.builtin.env', 'BITBUCKET_USERNAME') }}"
+      password: "{{ lookup('ansible.builtin.env', 'BITBUCKET_PASSWORD') }}"
+
+- name: "test-playbook | Commit and Create Branch"
+  hosts: localhost
+  tasks:
+  - shell: |-
+      rm -rf branchtest
+      git clone https://{{ lookup('ansible.builtin.env', 'BITBUCKET_SERVER') }}/scm/test/branchtest.git
+      cd branchtest
+      git checkout testbranch
+      echo "test" | tee -a test
+      git add test
+      git commit -m "."
+      git push
+
+
+  - rangeid.bitbucketserver.pullrequest:
+      server: "https://{{ lookup('ansible.builtin.env', 'BITBUCKET_SERVER') }}"
+      project: "test"
+      repository: "branchtest"
+      from_branch: testbranch
+      to_branch: master
+      actions: 
+      - create
+      - approve
+      - merge
+      title: my-beautiful-pr
+      description: "Prova di pr"
+      username: "{{ lookup('ansible.builtin.env', 'BITBUCKET_USERNAME') }}"
+      password: "{{ lookup('ansible.builtin.env', 'BITBUCKET_PASSWORD') }}"
+      ignore_existing_on_create: True
+
+
+- name: "test-playbook | Commit and Create Branch"
+  hosts: localhost
+  tasks:
+  - rangeid.bitbucketserver.branch:
+      server: "https://{{ lookup('ansible.builtin.env', 'BITBUCKET_SERVER') }}"
+      project: "test"
+      repository: "branchtest"
+      branch: testbranch
+      action: delete
+      username: "{{ lookup('ansible.builtin.env', 'BITBUCKET_USERNAME') }}"
+      password: "{{ lookup('ansible.builtin.env', 'BITBUCKET_PASSWORD') }}"
