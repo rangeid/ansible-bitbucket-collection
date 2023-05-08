@@ -10,3 +10,4 @@ description: Manage Bitbucket Repository
 license:
     - BSD-3-Clause
 
+repository: "https://github.com/rangeid/ansible-bitbucket-collection"
