@@ -1,3 +1,7 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+# Copyright: (c) 2023, Angelo Conforti (angeloxx@angeloxx.it)
+
 from __future__ import absolute_import, division, print_function
 from ansible.module_utils.basic import AnsibleModule
 import requests, json
@@ -7,9 +11,58 @@ __metaclass__ = type
 
 
 DOCUMENTATION = """
+---
+module: branch
+author:
+    - "Angelo Conforti (@angeloxx)"
+description: Perform branch management on Bibbucket Server
+module: branch
+options:
+  server:
+    description:
+    - The Bitbucket URL in the format https://<server> or https://<server>/<context>
+    type: url
+    required: true
+  project:
+    description:
+    - The project name, usually 2-4 letters
+    type: str
+    required: true
+  repository:
+    description:
+    - The repository name, inside the project and without the ".git" extension
+    type: str
+    required: true
+  username:
+    description:
+    - The Bitbucket user with branch creation and deletion rights
+    type: str
+    required: true
+  password:
+    description:
+    - The Bitbucket user's password
+    type: str
+    required: true
+  branch:
+    description:
+    - The new branch name
+    type: str
+    required: true
+  from_branch:
+    description:
+    - The origin branch name
+    type: str
+    required: true
+  action:
+    description:
+    - The performed action
+    type: choices
+    choices:
+    - create
+    - delete
+    default: create
+    required: false
 """
-
-
 
 
 def main():
@@ -66,10 +119,9 @@ def main():
             result['changed'] = True
         else:
             error_data = json.loads(response.content.decode('utf-8'))
-            module.fail_json(msg=f"Error creating new branch: {error_data['errors'][0]['message']}")    
+            module.fail_json(msg=f"Error creating new branch: {error_data['errors'][0]['message']}")
       except requests.exceptions.RequestException as e:
         module.fail_json(msg=f"Request error: {e}")
-
 
     if action == 'delete':
       data = {
@@ -89,7 +141,7 @@ def main():
             result['changed'] = True
         else:
             error_data = json.loads(response.content.decode('utf-8'))
-            module.fail_json(msg=f"Error deleting branch: {error_data['errors'][0]['message']}")    
+            module.fail_json(msg=f"Error deleting branch: {error_data['errors'][0]['message']}")
       except requests.exceptions.RequestException as e:
         module.fail_json(msg=f"Request error: {e}")
 

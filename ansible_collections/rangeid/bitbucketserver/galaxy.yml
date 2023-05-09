@@ -1,6 +1,6 @@
 namespace: rangeid
 name: bitbucketserver
-version: 0.0.1
+version: 0.0.2
 readme: README.md
 
 authors:
@@ -11,3 +11,4 @@ license:
     - BSD-3-Clause
 
 repository: "https://github.com/rangeid/ansible-bitbucket-collection"
+issues: "https://github.com/rangeid/ansible-bitbucket-collection/issues"

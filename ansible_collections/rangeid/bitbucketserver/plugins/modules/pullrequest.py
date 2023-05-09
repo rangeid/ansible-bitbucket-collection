@@ -7,6 +7,78 @@ __metaclass__ = type
 
 
 DOCUMENTATION = """
+---
+module: pullrequest
+author:
+    - "Angelo Conforti (@angeloxx)"
+description: Perform pull-request management on Bibbucket Server
+module: pullrequest
+options:
+  server:
+    description:
+    - The Bitbucket URL in the format https://<server> or https://<server>/<context>
+    type: url
+    required: true
+  project:
+    description:
+    - The project name, usually 2-4 letters
+    type: str
+    required: true
+  repository:
+    description:
+    - The repository name, inside the project and without the ".git" extension
+    type: str
+    required: true
+  username:
+    description:
+    - The Bitbucket user with branch creation and deletion rights
+    type: str
+    required: true
+  password:
+    description:
+    - The Bitbucket user's password
+    type: str
+    required: true
+  to_branch:
+    description:
+    - The source branch
+    type: str
+    default: master
+    required: false
+  from_branch:
+    description:
+    - The destination branch
+    type: str
+    required: true
+  title:
+    description:
+    - The pull request title, always required to create or find the pull request to approve or merge
+    type: str
+    required: true
+  description:
+    description:
+    - The pull request description
+    type: str
+    required: false
+  authors:
+    description:
+    - The pull request author name
+    type: str
+    required: true
+  actions:
+    description:
+    - The performed action, multiple options are allowed.
+    - B(create) will create new PR from from_branch to to_branch with specified title and description
+    - B(approve) will approve a PR (but Bitbucket doesn't allow to approve own PR)
+    - B(merge) action will merge from_branch to to_branch
+    type: list
+    elements: str
+    required: true
+  ignore_existing_on_create:
+    description:
+    - Don't raise an error if create fails due an existing branch with same source and destination branch
+    type: str
+    required: true
 """
 
 def getPullRequests(server,project,repository,username,password,title):
@@ -30,7 +102,7 @@ def main():
         username=dict(required=True, type="str"),
         password=dict(required=True, type="str", no_log=True),
         to_branch=dict(default="master", type="str"),
-        from_branch=dict(required=True, type="str"),
+        from_branch=dict(type="str"),
         title=dict(required=True, type="str"),
         description=dict(required=False, type="str"),
         author=dict(default="Ansible", type="str"),
@@ -40,8 +112,8 @@ def main():
 
     module = AnsibleModule(
       argument_spec=argument_spec,
-    #     required_together=[("comment", "add")],
-    #     required_one_of=[("add", "pull", "push")]
+    # required_together=[("to_branch", "from_branch")],
+    #  required_one_of=[("add", "pull", "push")]
     )
 
     server = module.params.get("server")
@@ -121,10 +193,10 @@ def main():
           if pr['state'] == 'OPEN' and pr['title'] == title and pr['fromRef']['displayId'] == branch_from and pr['toRef']['displayId'] == branch_to:
             mypr = pr
             break
-        
+
         if mypr == {}:
            module.fail_json(msg=f"Unable to find a PR that matches requested parameters")
-       
+
         data = {
           "user": {
               "name": author
@@ -158,7 +230,7 @@ def main():
           if pr['state'] == 'OPEN' and pr['title'] == title and pr['fromRef']['displayId'] == branch_from and pr['toRef']['displayId'] == branch_to:
             mypr = pr
             break
-        
+
         if mypr == {}:
             module.fail_json(msg=f"Unable to find a PR that matches requested parameters")
 
