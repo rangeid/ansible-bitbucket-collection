@@ -1,4 +1,4 @@
-- name: "test-playbook | Commit and Create Branch"
+- name: "test-playbook | Create Branch"
   hosts: localhost
   tasks:
   - rangeid.bitbucketserver.branch:
@@ -9,8 +9,9 @@
       action: create
       username: "{{ lookup('ansible.builtin.env', 'BITBUCKET_USERNAME') }}"
       password: "{{ lookup('ansible.builtin.env', 'BITBUCKET_PASSWORD') }}"
+    failed_when: false
 
-- name: "test-playbook | Commit and Create Branch"
+- name: "test-playbook | Checkout branch and commit contents"
   hosts: localhost
   tasks:
   - shell: |-
@@ -24,7 +25,8 @@
       git push
 
 
-  - rangeid.bitbucketserver.pullrequest:
+  - name: "test-playbook | Create and merge the PR"
+    rangeid.bitbucketserver.pullrequest:
       server: "https://{{ lookup('ansible.builtin.env', 'BITBUCKET_SERVER') }}"
       project: "test"
       repository: "branchtest"
@@ -32,7 +34,6 @@
       to_branch: master
       actions: 
       - create
-      - approve
       - merge
       title: my-beautiful-pr
       description: "Prova di pr"
@@ -41,7 +42,7 @@
       ignore_existing_on_create: True
 
 
-- name: "test-playbook | Commit and Create Branch"
+- name: "test-playbook | Delete dandling branch"
   hosts: localhost
   tasks:
   - rangeid.bitbucketserver.branch:
