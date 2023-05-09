@@ -66,7 +66,6 @@ def main():
       module.fail_json('Server must be https://<servername>')
 
     if "create" in actions:
-      module.warn(f"Create branch in action")
       new_pr = {
           "title": title,
           "description": description,
@@ -107,7 +106,7 @@ def main():
            module.warn('A pull-request already exists, ignoring error as requested')
         else:
           if response.ok:
-            pass
+            result['changed'] = True
           else:
               error_data = json.loads(response.content.decode('utf-8'))
               module.fail_json(msg=f"Error creating new pull request: {error_data['errors'][0]['message']}")
@@ -115,7 +114,6 @@ def main():
         module.fail_json(msg=f"Request error: {e}")
 
     if "approve" in actions:
-      module.warn(f"Approve pull-request in action")
       try:
         prs = getPullRequests(server,project,repository,username,password,title)
         mypr = {}
@@ -145,18 +143,14 @@ def main():
 
 
         if response.ok:
-          pass
+            result['changed'] = True
         else:
-          print(response.content)
           error_data = json.loads(response.content.decode('utf-8'))
           module.fail_json(msg=f"Error approving pull request: {error_data['errors'][0]['message']}")
       except requests.exceptions.RequestException as e:
         module.fail_json(msg=f"Request error: {e}")
 
     if "merge" in actions:
-      module.warn(f"Merge pull-request in action")
-
-
       try:
         prs = getPullRequests(server,project,repository,username,password,title)
         mypr = {}
@@ -180,9 +174,8 @@ def main():
 
 
         if response.ok:
-          pass
+            result['changed'] = True
         else:
-          print(response.content)
           error_data = json.loads(response.content.decode('utf-8'))
           module.fail_json(msg=f"Error approving pull request: {error_data['errors'][0]['message']}")
       except requests.exceptions.RequestException as e:
