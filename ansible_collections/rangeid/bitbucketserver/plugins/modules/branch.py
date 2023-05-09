@@ -63,7 +63,7 @@ def main():
           module.fail_json(msg=f"Access denied for user {username}")
 
         if response.ok:
-            pass
+            result['changed'] = True
         else:
             error_data = json.loads(response.content.decode('utf-8'))
             module.fail_json(msg=f"Error creating new branch: {error_data['errors'][0]['message']}")    
@@ -86,7 +86,7 @@ def main():
           module.fail_json(msg=f"Access denied for user {username}")
 
         if response.ok:
-            pass
+            result['changed'] = True
         else:
             error_data = json.loads(response.content.decode('utf-8'))
             module.fail_json(msg=f"Error deleting branch: {error_data['errors'][0]['message']}")    
