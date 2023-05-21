@@ -9,7 +9,8 @@ steps:
   image: repo-docker-hosted.angeloxx.lan/angeloxx/drone/plugins/galaxy:stable
   pull: always
   settings:
-    key: GITHUB_TOKEN
+    key: 
+      from_secret: GITHUB_TOKEN
     collection: "rangeid/bitbucketserver"
   when:
     branch:
