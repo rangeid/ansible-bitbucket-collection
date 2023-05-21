@@ -6,9 +6,7 @@ platform:
   arch: arm64
 steps:
 - name: build
-  plugin_registry:
-    - repo-docker-hosted.angeloxx.lan/angeloxx/drone
-  image: plugins/galaxy:latest
+  image: repo-docker-hosted.angeloxx.lan/angeloxx/drone/plugins/galaxy:latest
   settings:
     key: GITHUB_TOKEN
   when:
