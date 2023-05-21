@@ -1,0 +1,20 @@
+kind: pipeline
+type: galaxy
+name: build_and_push
+platform:
+  os: linux
+  arch: arm64
+steps:
+- name: build
+  image: angeloxx/drone/plugins/galaxy
+  settings:
+    key: GITHUB_TOKEN
+  when:
+    branch:
+    - master
+trigger:
+  event:
+  - push
+  - custom
+  branch:
+  - master
