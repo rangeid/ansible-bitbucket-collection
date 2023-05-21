@@ -11,7 +11,7 @@ steps:
   settings:
     key: 
       from_secret: GITHUB_TOKEN
-    collection: "rangeid/bitbucketserver"
+    collection: rangeid/bitbucketserver
   when:
     branch:
     - master
