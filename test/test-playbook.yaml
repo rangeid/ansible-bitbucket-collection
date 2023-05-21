@@ -1,4 +1,10 @@
-- name: "test-playbook | Commit and Create Branch"
+- name: "test-playbook | facts"
+  hosts: localhost
+  tasks:
+  - set_fact:
+      title: "This is a beautiful commit / contribute"
+
+- name: "test-playbook | Create Branch"
   hosts: localhost
   tasks:
   - rangeid.bitbucketserver.branch:
@@ -6,11 +12,12 @@
       project: "test"
       repository: "branchtest"
       branch: testbranch
-      action: create
+      state: present
       username: "{{ lookup('ansible.builtin.env', 'BITBUCKET_USERNAME') }}"
       password: "{{ lookup('ansible.builtin.env', 'BITBUCKET_PASSWORD') }}"
+    failed_when: false
 
-- name: "test-playbook | Commit and Create Branch"
+- name: "test-playbook | Checkout branch and commit contents"
   hosts: localhost
   tasks:
   - shell: |-
@@ -24,7 +31,8 @@
       git push
 
 
-  - rangeid.bitbucketserver.pullrequest:
+  - name: "test-playbook | Create PR"
+    rangeid.bitbucketserver.pullrequest:
       server: "https://{{ lookup('ansible.builtin.env', 'BITBUCKET_SERVER') }}"
       project: "test"
       repository: "branchtest"
@@ -32,16 +40,28 @@
       to_branch: master
       actions: 
       - create
-      - approve
-      - merge
-      title: my-beautiful-pr
+      title: "{{ title }}"
       description: "Prova di pr"
       username: "{{ lookup('ansible.builtin.env', 'BITBUCKET_USERNAME') }}"
       password: "{{ lookup('ansible.builtin.env', 'BITBUCKET_PASSWORD') }}"
-      ignore_existing_on_create: True
+      delete_existing_on_create: True
 
+  - name: "test-playbook | Merge the PR"
+    rangeid.bitbucketserver.pullrequest:
+      server: "https://{{ lookup('ansible.builtin.env', 'BITBUCKET_SERVER') }}"
+      project: "test"
+      repository: "branchtest"
+      from_branch: testbranch
+      to_branch: master
+      actions: 
+      - merge
+      title: "{{ title }}"
+      description: "Prova di pr"
+      username: "{{ lookup('ansible.builtin.env', 'BITBUCKET_USERNAME') }}"
+      password: "{{ lookup('ansible.builtin.env', 'BITBUCKET_PASSWORD') }}"
+      delete_existing_on_create: True
 
-- name: "test-playbook | Commit and Create Branch"
+- name: "test-playbook | Delete dandling branch"
   hosts: localhost
   tasks:
   - rangeid.bitbucketserver.branch:
@@ -49,6 +69,6 @@
       project: "test"
       repository: "branchtest"
       branch: testbranch
-      action: delete
+      state: absent
       username: "{{ lookup('ansible.builtin.env', 'BITBUCKET_USERNAME') }}"
       password: "{{ lookup('ansible.builtin.env', 'BITBUCKET_PASSWORD') }}"

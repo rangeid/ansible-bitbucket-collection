@@ -1,0 +1,24 @@
+kind: pipeline
+type: kubernetes
+name: build_and_push
+platform:
+  os: linux
+  arch: arm64
+steps:
+- name: build
+  image: repo-docker-hosted.angeloxx.lan/angeloxx/drone/plugins/galaxy:stable
+  pull: always
+  settings:
+    key: 
+      from_secret: API_TOKEN
+    collection: rangeid/bitbucketserver
+  when:
+    branch:
+    - master
+  trigger:
+  event:
+  - push
+  - custom
+  branch:
+  - master
+

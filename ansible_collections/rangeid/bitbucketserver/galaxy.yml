@@ -1,13 +1,14 @@
 namespace: rangeid
 name: bitbucketserver
-version: 0.0.1
+version: 0.0.9
 readme: README.md
 
 authors:
-    - Angelo Conforti <a.conforti@range-id.ti>
+    - Angelo Conforti <angeloxx@angeloxx.it>
 
 description: Manage Bitbucket Repository
 license:
     - BSD-3-Clause
 
 repository: "https://github.com/rangeid/ansible-bitbucket-collection"
+issues: "https://github.com/rangeid/ansible-bitbucket-collection/issues"
