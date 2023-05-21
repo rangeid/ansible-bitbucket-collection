@@ -10,7 +10,7 @@ steps:
   pull: always
   settings:
     key: 
-      from_secret: GITHUB_TOKEN
+      from_secret: API_TOKEN
     collection: rangeid/bitbucketserver
   when:
     branch:
