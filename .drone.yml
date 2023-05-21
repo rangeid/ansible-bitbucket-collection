@@ -7,7 +7,7 @@ platform:
 steps:
 - name: build
   plugin_registry:
-    - repo-docker-hosted.angeloxx.lan/angeloxx/drone
+    - repo-docker-hosted.angeloxx.lan/angeloxx/drone:latest
   image: plugins/galaxy
   settings:
     key: GITHUB_TOKEN
