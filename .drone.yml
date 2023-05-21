@@ -1,5 +1,5 @@
 kind: pipeline
-type: galaxy
+type: kubernetes
 name: build_and_push
 platform:
   os: linux
@@ -9,7 +9,6 @@ steps:
   plugin_registry:
     - repo-docker-hosted.angeloxx.lan/angeloxx/drone
   image: plugins/galaxy:latest
-  pull: if-not-exists
   settings:
     key: GITHUB_TOKEN
   when:
