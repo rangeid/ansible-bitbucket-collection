@@ -16,9 +16,9 @@ steps:
     branch:
     - master
   trigger:
-  event:
-  - push
-  - custom
-  branch:
-  - master
+    event:
+    - push
+    - custom
+    branch:
+    - master
 
