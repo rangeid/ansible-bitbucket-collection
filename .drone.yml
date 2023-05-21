@@ -7,8 +7,10 @@ platform:
 steps:
 - name: build
   image: repo-docker-hosted.angeloxx.lan/angeloxx/drone/plugins/galaxy:stable
+  pull: always
   settings:
     key: GITHUB_TOKEN
+    collection: "rangeid/bitbucketserver"
   when:
     branch:
     - master
