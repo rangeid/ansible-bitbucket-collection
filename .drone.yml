@@ -15,10 +15,6 @@ steps:
   when:
     branch:
     - master
-  trigger:
     event:
     - push
     - custom
-    branch:
-    - master
-
