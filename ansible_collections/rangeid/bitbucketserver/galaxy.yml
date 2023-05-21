@@ -1,10 +1,10 @@
 namespace: rangeid
 name: bitbucketserver
-version: 0.0.3
+version: 0.0.9
 readme: README.md
 
 authors:
-    - Angelo Conforti <a.conforti@range-id.ti>
+    - Angelo Conforti <angeloxx@angeloxx.it>
 
 description: Manage Bitbucket Repository
 license:

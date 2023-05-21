@@ -3,8 +3,9 @@
 # Copyright: (c) 2023, Angelo Conforti (angeloxx@angeloxx.it)
 
 from __future__ import absolute_import, division, print_function
+from ansible.module_utils._text import to_text
 from ansible.module_utils.basic import AnsibleModule
-import requests
+from ansible.module_utils.urls import fetch_url, basic_auth_header
 import json
 
 __metaclass__ = type
@@ -54,14 +55,14 @@ options:
     - The origin branch name
     type: str
     required: true
-  action:
+  state:
     description:
-    - The performed action
+    - The state of the branch
     type: choices
     choices:
-    - create
-    - delete
-    default: create
+    - present
+    - absent
+    default: present
     required: false
 """
 
@@ -75,7 +76,7 @@ def main():
         password=dict(required=True, type="str", no_log=True),
         branch=dict(required=True, type="str"),
         from_branch=dict(default="master", type="str"),
-        action=dict(default="create", type="str", choices=['create', 'delete'])
+        state=dict(default="present", type="str", choices=['present', 'absent'])
     )
 
     module = AnsibleModule(
@@ -87,9 +88,8 @@ def main():
     repository = module.params.get("repository")
     branch_to = module.params.get("branch")
     branch_from = module.params.get("from_branch")
+    state = module.params.get("state")
     username = module.params.get("username")
-    password = module.params.get("password")
-    action = module.params.get("action")
 
     module.run_command_environ_update = dict(
         LANG="C.UTF-8", LC_ALL="C.UTF-8",
@@ -97,10 +97,14 @@ def main():
     )
     result = dict(changed=False)
 
+    headers = {}
+    headers.update({'Authorization': basic_auth_header(module.params.get("username"), module.params.get("password"))})
+    headers.update({'Content-type': 'application/json'})
+
     if not server.startswith("https://"):
         module.fail_json('Server must be https://<servername>')
 
-    if action == 'create':
+    if state == 'present':
         data = {
             "name": branch_to,
             "startPoint": branch_from
@@ -108,41 +112,41 @@ def main():
 
         try:
             url = f'{server}/rest/branch-utils/1.0/projects/{project}/repos/{repository}/branches'
-            response = requests.post(url, auth=(username, password), json=data)
+            response, info = fetch_url(method="POST", module=module, url=url, headers=headers, data=json.dumps(data))
 
-            if response.status_code == 401:
+            if info['status'] == 401:
                 module.fail_json(msg=f"Access denied for user {username}, verify username and password")
-            if response.status_code == 403:
+            if info['status'] == 403:
                 module.fail_json(msg=f"Access denied for user {username}")
 
-            if response.ok:
+            if info['status'] in [200,201]:
                 result['changed'] = True
             else:
-                error_data = json.loads(response.content.decode('utf-8'))
+                error_data = json.loads(to_text(response.read()))
                 module.fail_json(msg=f"Error creating new branch: {error_data['errors'][0]['message']}")
-        except requests.exceptions.RequestException as e:
+        except Exception as e:
             module.fail_json(msg=f"Request error: {e}")
 
-    if action == 'delete':
+    if state == 'absent':
         data = {
             "name": branch_to,
         }
 
         try:
             url = f'{server}/rest/branch-utils/1.0/projects/{project}/repos/{repository}/branches'
-            response = requests.delete(url, auth=(username, password), json=data)
+            response, info = fetch_url(method="DELETE", module=module, url=url, headers=headers, data=json.dumps(data))
 
-            if response.status_code == 401:
+            if info['status'] == 401:
                 module.fail_json(msg=f"Access denied for user {username}, verify username and password")
-            if response.status_code == 403:
+            if info['status'] == 403:
                 module.fail_json(msg=f"Access denied for user {username}")
 
-            if response.ok:
+            if info['status'] in [204]:
                 result['changed'] = True
             else:
-                error_data = json.loads(response.content.decode('utf-8'))
+                error_data = json.loads(to_text(response.read()))
                 module.fail_json(msg=f"Error deleting branch: {error_data['errors'][0]['message']}")
-        except requests.exceptions.RequestException as e:
+        except Exception as e:
             module.fail_json(msg=f"Request error: {e}")
 
     module.exit_json(**result)

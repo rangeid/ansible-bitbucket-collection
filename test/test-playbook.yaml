@@ -1,3 +1,9 @@
+- name: "test-playbook | facts"
+  hosts: localhost
+  tasks:
+  - set_fact:
+      title: "This is a beautiful commit / contribute"
+
 - name: "test-playbook | Create Branch"
   hosts: localhost
   tasks:
@@ -6,7 +12,7 @@
       project: "test"
       repository: "branchtest"
       branch: testbranch
-      action: create
+      state: present
       username: "{{ lookup('ansible.builtin.env', 'BITBUCKET_USERNAME') }}"
       password: "{{ lookup('ansible.builtin.env', 'BITBUCKET_PASSWORD') }}"
     failed_when: false
@@ -25,7 +31,7 @@
       git push
 
 
-  - name: "test-playbook | Create and merge the PR"
+  - name: "test-playbook | Create PR"
     rangeid.bitbucketserver.pullrequest:
       server: "https://{{ lookup('ansible.builtin.env', 'BITBUCKET_SERVER') }}"
       project: "test"
@@ -34,13 +40,26 @@
       to_branch: master
       actions: 
       - create
-      - merge
-      title: my-beautiful-pr
+      title: "{{ title }}"
       description: "Prova di pr"
       username: "{{ lookup('ansible.builtin.env', 'BITBUCKET_USERNAME') }}"
       password: "{{ lookup('ansible.builtin.env', 'BITBUCKET_PASSWORD') }}"
-      ignore_existing_on_create: True
+      delete_existing_on_create: True
 
+  - name: "test-playbook | Merge the PR"
+    rangeid.bitbucketserver.pullrequest:
+      server: "https://{{ lookup('ansible.builtin.env', 'BITBUCKET_SERVER') }}"
+      project: "test"
+      repository: "branchtest"
+      from_branch: testbranch
+      to_branch: master
+      actions: 
+      - merge
+      title: "{{ title }}"
+      description: "Prova di pr"
+      username: "{{ lookup('ansible.builtin.env', 'BITBUCKET_USERNAME') }}"
+      password: "{{ lookup('ansible.builtin.env', 'BITBUCKET_PASSWORD') }}"
+      delete_existing_on_create: True
 
 - name: "test-playbook | Delete dandling branch"
   hosts: localhost
@@ -50,6 +69,6 @@
       project: "test"
       repository: "branchtest"
       branch: testbranch
-      action: delete
+      state: absent
       username: "{{ lookup('ansible.builtin.env', 'BITBUCKET_USERNAME') }}"
       password: "{{ lookup('ansible.builtin.env', 'BITBUCKET_PASSWORD') }}"
