@@ -12,10 +12,11 @@ steps:
   when:
     branch:
     - master
-trigger:
+    - development
+  trigger:
   event:
   - push
   - custom
   branch:
   - master
-  
+  - development
