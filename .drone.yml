@@ -22,4 +22,3 @@ steps:
   - custom
   branch:
   - master
-  - development
