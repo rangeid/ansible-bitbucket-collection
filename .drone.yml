@@ -18,3 +18,4 @@ trigger:
   - custom
   branch:
   - master
+  
