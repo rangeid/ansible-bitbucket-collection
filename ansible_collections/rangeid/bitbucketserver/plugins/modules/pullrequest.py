@@ -220,7 +220,6 @@ def approvePullRequest(module, result, server, username, password, project_key,
     response, info = fetch_url(method="POST", module=module, url=url,
                                headers=headers, data=json.dumps(data))
 
-    module.warn(str(response.read()))
     if info['status'] == 401:
         module.fail_json(
             msg=f"Access denied for user {username}, verify username and password")
