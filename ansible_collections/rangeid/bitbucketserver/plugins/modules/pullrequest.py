@@ -147,6 +147,7 @@ def mergePullRequest(module, result, server, username, password, project_key,
     data = {
         "version": version
     }
+
     response, info = fetch_url(module, url, headers=headers, method='POST',
                                data=json.dumps(data), timeout=30)
 
@@ -156,7 +157,8 @@ def mergePullRequest(module, result, server, username, password, project_key,
     elif info['status'] == 403:
         module.fail_json(msg=f"Access denied for user {username}")
     elif info['status'] == 200:
-        module.exit_json(changed=True, msg="Pull request successfully merged.")
+        result['changed'] = True
+        module.warn(f"Pull request {pull_request_id} successfully merged.")
     elif info['status'] == 409:
         error_data = json.loads(info['body'])
         module.fail_json(msg=f"Unable to merge the pull request "
@@ -285,8 +287,8 @@ def createPullRequest(module, result, server, username, password,
                                data=json.dumps(payload), timeout=30)
     # Check the response status code
     if info['status'] == 201:
-        module.exit_json(changed=True, msg="Pull request successfully\
-                            created.")
+        result['changed'] = True
+        module.warn("Pull request successfully created.")
     elif info['status'] == 409:
         if ignore_existing_on_create is True:
             error_data = json.loads(to_text(info['body']))
@@ -428,6 +430,7 @@ def main():
                 module.fail_json(
                     msg=f"Unable to find a PR that matches requested \
                         parameters (title={title})")
+            
             mergePullRequest(module, result, server, username, password, 
                              project, repository, mypr["id"], mypr["version"])
         except Exception as e:
