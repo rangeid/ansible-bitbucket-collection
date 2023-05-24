@@ -122,7 +122,7 @@ def main():
             if info['status'] in [200,201]:
                 result['changed'] = True
             else:
-                error_data = json.loads(to_text(response.read()))
+                error_data = json.loads(info['body'])
                 module.fail_json(msg=f"Error creating new branch: {error_data['errors'][0]['message']}")
         except Exception as e:
             module.fail_json(msg=f"Request error: {e}")
@@ -144,7 +144,7 @@ def main():
             if info['status'] in [204]:
                 result['changed'] = True
             else:
-                error_data = json.loads(to_text(response.read()))
+                error_data = json.loads(info['body'])
                 module.fail_json(msg=f"Error deleting branch: {error_data['errors'][0]['message']}")
         except Exception as e:
             module.fail_json(msg=f"Request error: {e}")
